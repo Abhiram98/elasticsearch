@@ -342,8 +342,12 @@ public final class SnapshotShardsService extends AbstractLifecycleComponent impl
                     failure = summarizeFailure(e);
                     logger.warn(() -> format("[%s][%s] failed to snapshot shard", shardId, snapshot), e);
                 }
-                snapshotStatus.moveToFailed(threadPool.absoluteTimeInMillis(), failure);
+                moveToUnsuccessful(failure);
                 notifyUnsuccessfulSnapshotShard(snapshot, shardId, failure, snapshotStatus.generation());
+            }
+
+            private void moveToUnsuccessful(String failure) {
+                snapshotStatus.moveToFailed(threadPool.absoluteTimeInMillis(), failure);
             }
         });
     }
