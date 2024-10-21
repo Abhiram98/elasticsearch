@@ -53,7 +53,16 @@ public class IndexShardSnapshotStatus {
         /**
          * Snapshot aborted
          */
-        ABORTED
+        ABORTED,
+
+        /**
+         * Snapshot pausing because of node removal
+         */
+        PAUSING,
+        /**
+         * Snapshot paused because of node removal
+         */
+        PAUSED,
     }
 
     /**
@@ -114,6 +123,30 @@ public class IndexShardSnapshotStatus {
         this.incrementalSize = incrementalSize;
         this.failure = failure;
     }
+
+
+    public void setFailure(String failure) {
+        this.failure = failure;
+    }
+
+
+    public long getTotalTime() {
+        return totalTime;
+    }
+
+    public void setTotalTime(long totalTime) {
+        this.totalTime = totalTime;
+    }
+
+    public AtomicReference<Stage> getStage() {
+        return stage;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+
 
     public synchronized Copy moveToStarted(
         final long startTime,
