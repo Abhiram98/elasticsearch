@@ -171,6 +171,10 @@ public class EsqlSession {
                 matchFields
             );
         });
+        resolvePolicy(groupedListener, policyNames, resolution);
+    }
+
+    private void resolvePolicy(ActionListener<Void> groupedListener, Set<String> policyNames, EnrichResolution resolution) {
         try (RefCountingListener refs = new RefCountingListener(groupedListener)) {
             for (String policyName : policyNames) {
                 enrichPolicyResolver.resolvePolicy(policyName, refs.acquire(resolution.resolvedPolicies()::add));
