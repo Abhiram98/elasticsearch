@@ -256,7 +256,7 @@ public class LocalExecutionPlanner {
         Function<SearchContext, Query> querySupplier = EsPhysicalOperationProviders.querySupplier(stat.filter(statsQuery.query()));
 
         Expression limitExp = statsQuery.limit();
-        int limit = limitExp != null ? (Integer) limitExp.fold() : NO_LIMIT;
+        int limit = countSource(limitExp);
         final LuceneOperator.Factory luceneFactory = new LuceneCountOperator.Factory(
             esProvider.searchContexts(),
             querySupplier,
@@ -270,6 +270,11 @@ public class LocalExecutionPlanner {
         int instanceCount = Math.max(1, luceneFactory.taskConcurrency());
         context.driverParallelism(new DriverParallelism(DriverParallelism.Type.DATA_PARALLELISM, instanceCount));
         return PhysicalOperation.fromSource(luceneFactory, layout.build());
+    }
+
+    private int countSource(Expression limitExp) {
+        int limit = limitExp != null ? (Integer) limitExp.fold() : NO_LIMIT;
+        return limit;
     }
 
     private PhysicalOperation planFieldExtractNode(LocalExecutionPlannerContext context, FieldExtractExec fieldExtractExec) {
