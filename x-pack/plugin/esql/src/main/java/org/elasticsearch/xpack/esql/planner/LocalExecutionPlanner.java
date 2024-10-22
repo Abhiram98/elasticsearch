@@ -256,14 +256,7 @@ public class LocalExecutionPlanner {
         Function<SearchContext, Query> querySupplier = EsPhysicalOperationProviders.querySupplier(stat.filter(statsQuery.query()));
 
         Expression limitExp = statsQuery.limit();
-        int limit = countSource(limitExp);
-        final LuceneOperator.Factory luceneFactory = new LuceneCountOperator.Factory(
-            esProvider.searchContexts(),
-            querySupplier,
-            context.queryPragmas.dataPartitioning(),
-            context.queryPragmas.taskConcurrency(),
-            limit
-        );
+        final LuceneOperator.Factory luceneFactory = countSource(context, limitExp, esProvider, querySupplier);
 
         Layout.Builder layout = new Layout.Builder();
         layout.append(statsQuery.outputSet());
@@ -272,9 +265,16 @@ public class LocalExecutionPlanner {
         return PhysicalOperation.fromSource(luceneFactory, layout.build());
     }
 
-    private int countSource(Expression limitExp) {
+    private LuceneOperator.Factory countSource(LocalExecutionPlannerContext context, Expression limitExp, EsPhysicalOperationProviders esProvider, Function<SearchContext, Query> querySupplier) {
         int limit = limitExp != null ? (Integer) limitExp.fold() : NO_LIMIT;
-        return limit;
+        final LuceneOperator.Factory luceneFactory = new LuceneCountOperator.Factory(
+            esProvider.searchContexts(),
+            querySupplier,
+            context.queryPragmas().dataPartitioning(),
+            context.queryPragmas().taskConcurrency(),
+            limit
+        );
+        return luceneFactory;
     }
 
     private PhysicalOperation planFieldExtractNode(LocalExecutionPlannerContext context, FieldExtractExec fieldExtractExec) {
