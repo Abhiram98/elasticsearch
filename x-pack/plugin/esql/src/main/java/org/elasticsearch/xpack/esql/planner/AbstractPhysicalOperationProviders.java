@@ -257,7 +257,7 @@ public abstract class AbstractPhysicalOperationProviders implements PhysicalOper
                                 );
                             }
                         } else {
-                            List<Expression> inputExpressions = new ArrayList<>();
+                            List<Expression> inputExpressions = inputExpressions();
                             inputExpressions.add(field);
                             for (Expression param : aggregateFunction.parameters()) {
                                 if (param.foldable() == false) {
@@ -297,6 +297,11 @@ public abstract class AbstractPhysicalOperationProviders implements PhysicalOper
                 }
             }
         }
+    }
+
+    private List<Expression> inputExpressions() {
+        List<Expression> inputExpressions = new ArrayList<>();
+        return inputExpressions;
     }
 
     private record GroupSpec(Integer channel, Attribute attribute) {
