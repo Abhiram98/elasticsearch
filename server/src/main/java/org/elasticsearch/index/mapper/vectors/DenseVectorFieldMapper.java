@@ -1425,7 +1425,7 @@ public class DenseVectorFieldMapper extends FieldMapper {
                 );
             }
 
-            checkDimensions(queryVector);
+            checkDimensions(queryVector.length, dims);
 
             if (elementType != ElementType.BYTE) {
                 throw new IllegalArgumentException(
@@ -1463,7 +1463,7 @@ public class DenseVectorFieldMapper extends FieldMapper {
         }
 
         private Query createExactKnnByteQuery(byte[] queryVector) {
-            checkDimensions(queryVector);
+            checkDimensions(queryVector.length, dims);
             if (similarity == VectorSimilarity.DOT_PRODUCT || similarity == VectorSimilarity.COSINE) {
                 float squaredMagnitude = VectorUtil.dotProduct(queryVector, queryVector);
                 elementType.checkVectorMagnitude(similarity, ElementType.errorByteElementsAppender(queryVector), squaredMagnitude);
@@ -1471,20 +1471,16 @@ public class DenseVectorFieldMapper extends FieldMapper {
             return new DenseVectorQuery.Bytes(queryVector, name());
         }
 
-        private void checkDimensions(byte[] queryVector) {
-            if (queryVector.length != dims) {
+        private void checkDimensions(int length, Integer dims) {
+            if (length != dims) {
                 throw new IllegalArgumentException(
-                    "the query vector has a different dimension [" + queryVector.length + "] than the index vectors [" + dims + "]"
+                    "the query vector has a different dimension [" + length + "] than the index vectors [" + dims + "]"
                 );
             }
         }
 
         private Query createExactKnnFloatQuery(float[] queryVector) {
-            if (queryVector.length != dims) {
-                throw new IllegalArgumentException(
-                    "the query vector has a different dimension [" + queryVector.length + "] than the index vectors [" + dims + "]"
-                );
-            }
+            checkDimensions(queryVector.length, dims);
             elementType.checkVectorBounds(queryVector);
             if (similarity == VectorSimilarity.DOT_PRODUCT || similarity == VectorSimilarity.COSINE) {
                 float squaredMagnitude = VectorUtil.dotProduct(queryVector, queryVector);
@@ -1531,7 +1527,7 @@ public class DenseVectorFieldMapper extends FieldMapper {
             Float similarityThreshold,
             BitSetProducer parentFilter
         ) {
-            checkDimensions(queryVector);
+            checkDimensions(queryVector.length, dims);
 
             if (similarity == VectorSimilarity.DOT_PRODUCT || similarity == VectorSimilarity.COSINE) {
                 float squaredMagnitude = VectorUtil.dotProduct(queryVector, queryVector);
@@ -1557,11 +1553,7 @@ public class DenseVectorFieldMapper extends FieldMapper {
             Float similarityThreshold,
             BitSetProducer parentFilter
         ) {
-            if (queryVector.length != dims) {
-                throw new IllegalArgumentException(
-                    "the query vector has a different dimension [" + queryVector.length + "] than the index vectors [" + dims + "]"
-                );
-            }
+            checkDimensions(queryVector.length, dims);
             elementType.checkVectorBounds(queryVector);
             if (similarity == VectorSimilarity.DOT_PRODUCT || similarity == VectorSimilarity.COSINE) {
                 float squaredMagnitude = VectorUtil.dotProduct(queryVector, queryVector);
