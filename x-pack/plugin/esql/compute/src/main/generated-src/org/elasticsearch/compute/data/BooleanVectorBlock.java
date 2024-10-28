@@ -54,6 +54,10 @@ public final class BooleanVectorBlock extends AbstractVectorBlock implements Boo
     @Override
     public ReleasableIterator<BooleanBlock> lookup(IntBlock positions, ByteSizeValue targetBlockSize) {
         // TODO optimizations
+        return getBooleanLookup(positions, targetBlockSize);
+    }
+
+    private BooleanLookup getBooleanLookup(IntBlock positions, ByteSizeValue targetBlockSize) {
         return new BooleanLookup(this, positions, targetBlockSize);
     }
 
