@@ -1425,11 +1425,7 @@ public class DenseVectorFieldMapper extends FieldMapper {
                 );
             }
 
-            if (queryVector.length != dims) {
-                throw new IllegalArgumentException(
-                    "the query vector has a different dimension [" + queryVector.length + "] than the index vectors [" + dims + "]"
-                );
-            }
+            checkDimensions(queryVector);
 
             if (elementType != ElementType.BYTE) {
                 throw new IllegalArgumentException(
@@ -1535,11 +1531,7 @@ public class DenseVectorFieldMapper extends FieldMapper {
             Float similarityThreshold,
             BitSetProducer parentFilter
         ) {
-            if (queryVector.length != dims) {
-                throw new IllegalArgumentException(
-                    "the query vector has a different dimension [" + queryVector.length + "] than the index vectors [" + dims + "]"
-                );
-            }
+            checkDimensions(queryVector);
 
             if (similarity == VectorSimilarity.DOT_PRODUCT || similarity == VectorSimilarity.COSINE) {
                 float squaredMagnitude = VectorUtil.dotProduct(queryVector, queryVector);
