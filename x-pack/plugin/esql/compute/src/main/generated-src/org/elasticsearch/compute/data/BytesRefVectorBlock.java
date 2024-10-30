@@ -69,7 +69,7 @@ public final class BytesRefVectorBlock extends AbstractVectorBlock implements By
     }
 
     private BytesRefLookup getBytesRefLookup(IntBlock positions, ByteSizeValue targetBlockSize) {
-        return new BytesRefLookup(this, positions, targetBlockSize);
+        return new BytesRefLookup(this.vector.asBlock(), positions, targetBlockSize);
     }
 
     @Override
