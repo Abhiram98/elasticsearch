@@ -79,6 +79,10 @@ public final class SnapshotShardsService extends AbstractLifecycleComponent impl
 
     private final TransportService transportService;
 
+    public ThreadPool getThreadPool() {
+        return threadPool;
+    }
+
     private final ThreadPool threadPool;
 
     private final Map<Snapshot, Map<ShardId, IndexShardSnapshotStatus>> shardSnapshots = new HashMap<>();
@@ -346,19 +350,20 @@ public final class SnapshotShardsService extends AbstractLifecycleComponent impl
                     failure = summarizeFailure(e);
                     logger.warn(() -> format("[%s][%s] failed to snapshot shard", shardId, snapshot), e);
                 }
-                moveToUnsuccessful(nextStage, failure, threadPool.absoluteTimeInMillis());
+                moveToUnsuccessful(nextStage, failure, threadPool.absoluteTimeInMillis(), snapshotStatus);
                 notifyUnsuccessfulSnapshotShard(snapshot, shardId, failure, snapshotStatus.generation());
             }
 
-            private void moveToUnsuccessful(Stage newStage, String failure, long endTime) {
-                assert newStage == Stage.PAUSED || newStage == Stage.FAILURE : newStage;
-                if (newStage == Stage.PAUSED && snapshotStatus.getStage().compareAndSet(Stage.PAUSING, Stage.PAUSED)) {
-                    snapshotStatus.setTotalTime(Math.max(0L, endTime - snapshotStatus.getStartTime()));
-                    snapshotStatus.setFailure(failure);
-                }
-                snapshotStatus.moveToFailed(threadPool.absoluteTimeInMillis(), failure);
-            }
+
         });
+    }
+    private void moveToUnsuccessful(Stage newStage, String failure, long endTime, IndexShardSnapshotStatus snapshotStatus) {
+        assert newStage == Stage.PAUSED || newStage == Stage.FAILURE : newStage;
+        if (newStage == Stage.PAUSED && snapshotStatus.getStage().compareAndSet(Stage.PAUSING, Stage.PAUSED)) {
+            snapshotStatus.setTotalTime(Math.max(0L, endTime - snapshotStatus.getStartTime()));
+            snapshotStatus.setFailure(failure);
+        }
+        snapshotStatus.moveToFailed(getThreadPool().absoluteTimeInMillis(), failure);
     }
 
     // package private for testing
