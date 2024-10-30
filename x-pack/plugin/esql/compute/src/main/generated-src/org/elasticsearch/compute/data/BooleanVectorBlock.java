@@ -58,7 +58,7 @@ public final class BooleanVectorBlock extends AbstractVectorBlock implements Boo
     }
 
     private BooleanLookup getBooleanLookup(IntBlock positions, ByteSizeValue targetBlockSize) {
-        return new BooleanLookup(this, positions, targetBlockSize);
+        return new BooleanLookup(this.vector.asBlock(), positions, targetBlockSize);
     }
 
     @Override
